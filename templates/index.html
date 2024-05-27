@@ -11,14 +11,14 @@
   
 
   <div class="card" >
-    <div class="front" style="background-image: {{ movie['img_url'] }} ">
-        <p class="large">{{movie['ranking']}}</p>
+    <div class="front" style="background-image: url('{{movie.img_url}}');">
+        <p class="large">1</p>
     </div>
     <div class="back">
       <div>
-    <div class="title">{{movie['title']}} <span class="{{movie['year']}}</span></div>
+    <div class="title">{{movie['title']}} <span class="release_date">(2011)</span></div>
         <div class="rating">
-            <label>{{movie['rating']}}</label>
+            <label>{{movie['ranking']}}</label>
           <i class="fas fa-star star"></i>
         </div>
           <p class="review">"{{movie['review']}}"</p>
