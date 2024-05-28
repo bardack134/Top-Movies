@@ -8,6 +8,10 @@ from wtforms.validators import InputRequired
 from wtforms import  StringField, validators
 from flask_bootstrap import Bootstrap5
 import requests
+from constants import API_KEY
+
+# EndPoin of the Movies API, https://developer.themoviedb.org/docs/search-and-query-for-details
+url = "https://api.themoviedb.org/3/search/movie?api_key=" + API_KEY
 
 
 # Create the Flask app
@@ -172,8 +176,35 @@ def add():
         
         print(new_movie_title) 
         
+        #NOTE:Using the movie title entered by the user, we make a GET request to the movie API,
+        # where we will retrieve the movie information.
+        
+        parameters={
+            'query':new_movie_title
+        }
+        
+        # Making a GET request 
+        response = requests.get(url,  params=parameters).json() 
+
+        # Initialize an empty list to store the movie data
+        data_list=[]
+
+        # Loop through the results in the JSON response
+        for movie in response['results']:
+            
+            # Create a dictionary for each movie
+            data={}
+            
+            # Add the title and release date to the dictionary
+            data['release_date'] = movie['release_date']
+            data['title'] = movie['title']
+            
+            # Append the dictionary to the data_list
+            data_list.append(data)
+            
+            #TODO: RENDERIZAR LA INFORMACION 'MOVIE_DATA' EN SELECT.HTML
         # Redirect to the home page
-        return redirect(url_for('home'))
+        return render_template("select.html", movie_data=data_list)
     
     # Render the 'index.html' template with the list of movies
     return render_template("add.html", form=new_movie_form)
