@@ -1,11 +1,12 @@
 from flask import Flask, render_template, redirect, url_for, request
-from flask_bootstrap import Bootstrap5
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 from sqlalchemy import Integer, String, Float
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
+from wtforms import DecimalField, StringField, SubmitField
+from wtforms.validators import InputRequired 
+from wtforms import  StringField, validators
+from flask_bootstrap import Bootstrap5
 import requests
 
 
@@ -72,6 +73,41 @@ with app.app_context():
 def home():
     all_movies = db.session.execute(db.select(Movie).order_by(Movie.ranking)).scalars().all()
     return render_template("index.html", movies=all_movies)
+
+
+class UpdateForm(FlaskForm):
+    rating     = DecimalField('Rating', [validators.DataRequired(message="Rating is required.")])
+    
+    review       = StringField('Review', [validators.Length(min=6, max=35), validators.DataRequired(message="Review is required.")])
+    
+    # Submit button
+    submit = SubmitField('Submit')
+    
+    
+@app.route("/edit", methods=['GET', 'POST'])
+def edit():
+    
+    update_form=UpdateForm()
+    
+    if request.method == 'POST' and update_form.validate():
+       
+        rating=update_form.rating.data
+        review=update_form.review.data
+        
+        print(rating)
+        print(review)
+        
+        return redirect(url_for('home'))
+    else:
+        #The movie ID could also have been sent through the URL, for example @app.route('/edit/<id>'). 
+        # and create another funtion apart with the POST method
+        movie_id = request.args.get('id')
+        
+        movie_selected = db.get_or_404(Movie, movie_id)
+        
+        return render_template("edit.html", movie=movie_selected, form=update_form)
+    
+        
 
 
 if __name__ == '__main__':
