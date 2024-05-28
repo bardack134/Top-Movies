@@ -10,14 +10,19 @@ from flask_bootstrap import Bootstrap5
 import requests
 
 
-# create the app
+# Create the Flask app
 app = Flask(__name__)
+# Configure the secret key for the app (necessary for Flask-WTF)
 app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+# Initialize Bootstrap5 for the Flask app
 Bootstrap5(app)
+
 
 # CREATE DB
 class Base(DeclarativeBase):
   pass
+
+# Configure SQLAlchemy with the base model
 db = SQLAlchemy(model_class=Base)
 
 # configure the SQLite database, relative to the app instance folder
@@ -27,7 +32,7 @@ app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database.db"
 db.init_app(app)
 
 
-# CREATE TABLE
+# Create the Movie table in the database
 class Movie(db.Model):
     id= db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(250), unique=True, nullable=False)
@@ -39,8 +44,11 @@ class Movie(db.Model):
     img_url= db.Column(db.String(250),  nullable=False)
 
     def __repr__(self):
+        # String representation of the Movie object
         return "<Title: {}>".format(self.title)
-    
+
+
+# Create the database tables within the app context    
 with app.app_context():
     db.create_all()
 
@@ -69,61 +77,81 @@ with app.app_context():
 #     db.session.commit()
 
         
+# Main route for the home page
 @app.route("/")
 def home():
+    
+    # Get all movies ordered by ranking
     all_movies = db.session.execute(db.select(Movie).order_by(Movie.ranking)).scalars().all()
+    
+    # Render the 'index.html' template with the list of movies
     return render_template("index.html", movies=all_movies)
 
 
+# Form class for updating movies
 class UpdateForm(FlaskForm):
-    rating     = DecimalField('Rating', [validators.DataRequired(message="Rating is required.")])
     
-    review       = StringField('Review', [validators.Length(min=6, max=35), validators.DataRequired(message="Review is required.")])
+    # Rating field with required input validation
+    rating = DecimalField('Rating', [validators.DataRequired(message="Rating is required.")])
+    
+    # Review field with length validation and required input validation
+    review = StringField('Review', [validators.Length(min=6, max=35), validators.DataRequired(message="Review is required.")])
     
     # Submit button
     submit = SubmitField('Submit')
     
     
+
+# Route to edit an existing movie
 @app.route("/edit/<int:id>", methods=['GET', 'POST'])
 def edit(id):
     
-    update_form=UpdateForm()
+    # Create an instance of the update form
+    update_form = UpdateForm()
     
-    
+    # Get the selected movie by id, or return 404 if not found
     movie_selected = db.get_or_404(Movie, id)
     
     if request.method == 'POST' and update_form.validate():
-       
-        rating=update_form.rating.data
-        review=update_form.review.data
+        
+        # Get the form data
+        rating = update_form.rating.data
+        review = update_form.review.data
         
         print(rating)
         print(review)
         
+        # Update the selected movie's data
+        movie_selected.rating = rating
+        movie_selected.review = review
         
-        #updating data
-        movie_selected.rating=rating
-        movie_selected.review=review
+        # Commit the changes to the database
         db.session.commit()
-   
-            
+        
+        # Redirect to the home page
         return redirect(url_for('home'))
     else:
-        
+        # Render the 'edit.html' template with the selected movie and the update form
         return render_template("edit.html", movie=movie_selected, form=update_form)
- 
     
+    
+# Route to delete an existing movie
 @app.route("/delete/<id>")
 def delete(id):
-     
+    
+    # Get the movie to delete by id, or return 404 if not found
     movie_to_delete = db.get_or_404(Movie, id)
-        
+    
+    # Delete the movie from the database
     db.session.delete(movie_to_delete)
     
+    # Commit the changes to the database
     db.session.commit()
-   
-            
+    
+    # Redirect to the home page
     return redirect(url_for('home'))
+  
+ 
    
     
         
