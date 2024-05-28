@@ -152,6 +152,32 @@ def delete(id):
     return redirect(url_for('home'))
   
 
+#form for adding a new movie
+class NewMovie(FlaskForm):
+    #title of the new movie
+    title = StringField(validators=[validators.DataRequired()])
+    
+    # Submit button
+    submit = SubmitField('Submit')
+
+# route for the add page
+@app.route("/add",  methods=['GET', 'POST'])
+def add():
+    
+    new_movie_form=NewMovie()
+    
+    if new_movie_form.validate_on_submit():
+        
+        new_movie_title=new_movie_form.title.data
+        
+        print(new_movie_title) 
+        
+        # Redirect to the home page
+        return redirect(url_for('home'))
+    
+    # Render the 'index.html' template with the list of movies
+    return render_template("add.html", form=new_movie_form)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
