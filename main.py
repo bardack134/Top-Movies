@@ -92,7 +92,7 @@ def home():
 class UpdateForm(FlaskForm):
     
     # Rating field with required input validation
-    rating = DecimalField('Rating', [validators.DataRequired(message="Rating is required.")])
+    rating = DecimalField('Rating', [validators.DataRequired(message="Rating is required."), validators.NumberRange(min=1, max=10, message="out of range")])
     
     # Review field with length validation and required input validation
     review = StringField('Review', [validators.Length(min=6, max=35), validators.DataRequired(message="Review is required.")])
@@ -151,11 +151,6 @@ def delete(id):
     # Redirect to the home page
     return redirect(url_for('home'))
   
- 
-   
-    
-        
-        
 
 
 if __name__ == '__main__':
