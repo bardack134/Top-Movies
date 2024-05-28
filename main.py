@@ -111,7 +111,22 @@ def edit(id):
     else:
         
         return render_template("edit.html", movie=movie_selected, form=update_form)
+ 
     
+@app.route("/delete/<id>")
+def delete(id):
+     
+    movie_to_delete = db.get_or_404(Movie, id)
+        
+    db.session.delete(movie_to_delete)
+    
+    db.session.commit()
+   
+            
+    return redirect(url_for('home'))
+   
+    
+        
         
 
 
