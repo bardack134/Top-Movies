@@ -84,10 +84,13 @@ class UpdateForm(FlaskForm):
     submit = SubmitField('Submit')
     
     
-@app.route("/edit", methods=['GET', 'POST'])
-def edit():
+@app.route("/edit/<int:id>", methods=['GET', 'POST'])
+def edit(id):
     
     update_form=UpdateForm()
+    
+    
+    movie_selected = db.get_or_404(Movie, id)
     
     if request.method == 'POST' and update_form.validate():
        
@@ -97,13 +100,15 @@ def edit():
         print(rating)
         print(review)
         
+        
+        #updating data
+        movie_selected.rating=rating
+        movie_selected.review=review
+        db.session.commit()
+   
+            
         return redirect(url_for('home'))
     else:
-        #The movie ID could also have been sent through the URL, for example @app.route('/edit/<id>'). 
-        # and create another funtion apart with the POST method
-        movie_id = request.args.get('id')
-        
-        movie_selected = db.get_or_404(Movie, movie_id)
         
         return render_template("edit.html", movie=movie_selected, form=update_form)
     
