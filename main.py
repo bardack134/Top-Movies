@@ -1,3 +1,4 @@
+from pprint import pprint
 from flask import Flask, render_template, redirect, url_for, request
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
@@ -11,7 +12,10 @@ import requests
 from constants import API_KEY
 
 # EndPoin of the Movies API, https://developer.themoviedb.org/docs/search-and-query-for-details
-url = "https://api.themoviedb.org/3/search/movie?api_key=" + API_KEY
+url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}"
+
+# URL to watch the movies picture / movie poster
+base_image_url = "https://image.tmdb.org/t/p/w500"
 
 
 # Create the Flask app
@@ -180,7 +184,8 @@ def add():
         # where we will retrieve the movie information.
         
         parameters={
-            'query':new_movie_title
+            'query':new_movie_title,
+            
         }
         
         # Making a GET request 
@@ -198,6 +203,7 @@ def add():
             # Add the title and release date to the dictionary
             data['release_date'] = movie['release_date']
             data['title'] = movie['title']
+            data['id'] = movie['id']
             
             # Append the dictionary to the data_list
             data_list.append(data)
@@ -211,6 +217,57 @@ def add():
     # Render the 'index.html' template with the list of movies
     return render_template("add.html", form=new_movie_form)
 
+
+
+#"This function is responsible for finding detailed information about the movie selected by the user
+# in the select.html view."
+@app.route("/adding_movie_info/<id>")
+def adding_movie_info(id):
+
+    #we receive the id of the movie selected by the user
+    print(id)
+
+    # This is the URL where we will look for the detailed information about the movie.
+    movie_details_url=f'https://api.themoviedb.org/3/movie/{id}?api_key={API_KEY}'
+    
+    
+       
+    # Making a GET request to get the movie information
+    response = requests.get(movie_details_url).json() 
+
+    # for the debugging process
+    pprint(f"movie details {response}")
+    
+    # We create a dictionary with the data we need for the database.
+    movie_details={
+        'title': response['title'],
+        'url': base_image_url+ response['poster_path'],
+        'year': response['release_date'],
+        'description': response['overview']
+    }
+    
+    pprint(movie_details)
+    
+    #creating new movie
+    movie=Movie(
+        id= id,
+        title = movie_details['title'],
+        year= movie_details['year'],
+        description= movie_details['description'],
+        img_url= movie_details['url'],
+        rating=1,
+        ranking=1,
+        review='writing',
+    )
+
+    #we use the 'movie_details' to create new data in our dataBase
+    db.session.add(movie)
+    db.session.commit()
+        
+    
+    
+    # Redirect to the home page
+    return redirect(url_for('home'))
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -34,6 +34,12 @@ for movie in r['results']:
     
     data['release_date'] = movie['release_date']
     data['title'] = movie['title']
+    data['id'] = movie['id']
     data_list.append(data)
     
 pprint(data_list)
+
+#TODO: Use el identificador de la película que el usuario seleccionó para realizar una solicitud a la ruta de acceso get-movie-details.
+
+
+

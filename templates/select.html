@@ -9,7 +9,8 @@
   <p>
 
     {% for movie in movie_data %}
-         <a href="">{{ movie['title'] }} - {{ movie['release_date'] }}</a><br>
+         <a href="{{ url_for('adding_movie_info', id=movie['id'] ) }}">{{ movie['title'] }} - {{ movie['release_date'] }}</a><br>
+         <a href="" hidden >{{ movie['id'] }}</a><br>
         
     {% endfor %}
 
