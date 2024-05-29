@@ -10,6 +10,7 @@ from wtforms import  StringField, validators
 from flask_bootstrap import Bootstrap5
 import requests
 from constants import API_KEY
+from sqlalchemy.orm.exc import NoResultFound, MultipleResultsFound
 
 # EndPoin of the Movies API, https://developer.themoviedb.org/docs/search-and-query-for-details
 url = f"https://api.themoviedb.org/3/search/movie?api_key={API_KEY}"
@@ -250,24 +251,39 @@ def adding_movie_info(id):
     
     #creating new movie
     movie=Movie(
-        id= id,
         title = movie_details['title'],
         year= movie_details['year'],
         description= movie_details['description'],
         img_url= movie_details['url'],
         rating=1,
-        ranking=1,
+        ranking=0,
         review='writing',
     )
 
     #we use the 'movie_details' to create new data in our dataBase
     db.session.add(movie)
     db.session.commit()
+    
+    try:    
+        #From now on, we redirect to the edit view to complete the data fields that have not yet been filled in. 
+        # The edit view expects an ID. we get the all movie information searching by its title
+        movie = db.session.execute(db.select(Movie).filter_by(title=movie.title)).scalar_one()
+        print(movie.id)
+        print(movie.title)
         
+    except NoResultFound:
+        # if the movie is not found
+        return "Movie not found", 404
+    
+    except MultipleResultsFound:
+        # if there are so many movies with the same name
+        return "Multiple movies found", 400
     
     
-    # Redirect to the home page
-    return redirect(url_for('home'))
+    
+    
+    # Redirect to the "edit.html" page. 
+    return redirect(url_for('edit', id=movie.id))
 
 if __name__ == '__main__':
     app.run(debug=True)
