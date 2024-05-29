@@ -5,8 +5,15 @@
 {% block content %}
 <div class="container">
     <h1 class="heading">Select Movie</h1>
+    <p>MOVIE TITLE - MOVIE RELEASE DATE</p> 
   <p>
-    <a href="#"> MOVIE TITLE - MOVIE RELEASE DATE</a>
+
+    {% for movie in movie_data %}
+         <a href="">{{ movie['title'] }} - {{ movie['release_date'] }}</a><br>
+        
+    {% endfor %}
+
+
   </p>
 
 </div>

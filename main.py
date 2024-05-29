@@ -202,7 +202,9 @@ def add():
             # Append the dictionary to the data_list
             data_list.append(data)
             
-            #TODO: RENDERIZAR LA INFORMACION 'MOVIE_DATA' EN SELECT.HTML
+            
+            
+            
         # Redirect to the home page
         return render_template("select.html", movie_data=data_list)
     
