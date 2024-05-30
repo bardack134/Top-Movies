@@ -90,8 +90,16 @@ with app.app_context():
 @app.route("/")
 def home():
     
-    # Get all movies ordered by ranking
-    all_movies = db.session.execute(db.select(Movie).order_by(Movie.ranking)).scalars().all()
+    # Get all movies ordered by ranting, [all()] convert ScalarResult to Python List
+    all_movies = db.session.execute(db.select(Movie).order_by(Movie.rating)).scalars().all()
+    
+    print(all_movies)
+    print(type(all_movies))
+    
+    # Assign rankings to each movie based on its position in the list
+    for i in range(len(all_movies)):
+        all_movies[i].ranking = len(all_movies) - i
+    db.session.commit()
     
     # Render the 'index.html' template with the list of movies
     return render_template("index.html", movies=all_movies)
@@ -101,7 +109,7 @@ def home():
 class UpdateForm(FlaskForm):
     
     # Rating field with required input validation
-    rating = DecimalField('Rating', [validators.DataRequired(message="Rating is required."), validators.NumberRange(min=1, max=10, message="out of range")])
+    rating = DecimalField('Rating', [validators.DataRequired(message="Rating is required."), validators.NumberRange(min=1, max=10, message="Your Rating Out of 10 e.g. 7.5")])
     
     # Review field with length validation and required input validation
     review = StringField('Review', [validators.Length(min=6, max=35), validators.DataRequired(message="Review is required.")])
@@ -278,7 +286,6 @@ def adding_movie_info(id):
     except MultipleResultsFound:
         # if there are so many movies with the same name
         return "Multiple movies found", 400
-    
     
     
     
