@@ -16,17 +16,17 @@ Movie Library Manager is a web application developed with Flask that allows user
 
 ## Tools Used
 
--Flask: Used to create the web application and handle routing.  (https://flask.palletsprojects.com/en/3.0.x/quickstart/)
+-- Flask: Used to create the web application and handle routing.  (https://flask.palletsprojects.com/en/3.0.x/quickstart/)
 
--SQLAlchemy: Used for database management and ORM (Object-Relational Mapping) to interact with the SQLite database. (https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/)
+-- SQLAlchemy: Used for database management and ORM (Object-Relational Mapping) to interact with the SQLite database. (https://flask-sqlalchemy.palletsprojects.com/en/3.1.x/)
 
--Flask-WTF: Used for form handling and validation.
+-- Flask-WTF: Used for form handling and validation.
 
--Flask-Bootstrap: Used to integrate Bootstrap for better styling and layout of the web pages.
+-- Flask-Bootstrap: Used to integrate Bootstrap for better styling and layout of the web pages.
 
--The Movie Database (TMDb) API: Used to search for and retrieve detailed movie information. (https://developer.themoviedb.org/docs/finding-data)
+-- The Movie Database (TMDb) API: Used to search for and retrieve detailed movie information. (https://developer.themoviedb.org/docs/finding-data)
 
--SQLite: Used as the database to store movie details.
+-- SQLite: Used as the database to store movie details.
 
     
 ## Usage
